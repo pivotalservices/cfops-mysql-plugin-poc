@@ -84,7 +84,7 @@ type (
 	// Properties contains property settings for a job
 	Properties struct {
 		Identifier string            `json:"identifier"`
-		Value      map[string]string `json:"value"`
+		Value      interface{} `json:"value"`
 	}
 
 	// Instances contains instances for a job
@@ -95,7 +95,7 @@ type (
 
 	//ConfigurationParser - the parser to handle installation settings file parsing
 	ConfigurationParser struct {
-		InstallationSettings InstallationSettings
+		installationSettings InstallationSettings
 	}
 
 	//CCJob - a cloud controller job object

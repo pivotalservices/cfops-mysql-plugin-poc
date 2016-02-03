@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	cfopsplugin "github.com/pivotalservices/cfops/plugin/cfopsplugin"
 )
 
@@ -20,6 +21,12 @@ func NewMysqlPlugin() *MysqlPlugin {
 
 type MysqlPlugin struct {
 	Meta cfopsplugin.Meta
+	MysqlUserName string
+	MysqlPassword string
+	MysqlIP string
+	VMUserName string
+	VMKey string
+	VMPassword string
 }
 
 func (s *MysqlPlugin) GetMeta() (meta cfopsplugin.Meta) {
@@ -34,6 +41,11 @@ func (s *MysqlPlugin) Restore() (err error) {
 	return
 }
 
-func (s *MysqlPlugin) Setup(cfopsplugin.PivotalCF) (err error) {
+func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
+	mySqlProduct := pcf.GetProducts()
+	fmt.Println(len(mySqlProduct))
+	for i, _ := range mySqlProduct{
+	fmt.Println(i)
+	}
 	return
 }

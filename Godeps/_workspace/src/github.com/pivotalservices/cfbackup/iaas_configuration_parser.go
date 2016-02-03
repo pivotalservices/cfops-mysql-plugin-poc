@@ -4,16 +4,19 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"github.com/xchapter7x/lo"
 )
 
 //NewConfigurationParser - constructor for a ConfigurationParser from a json installationsettings file
 func NewConfigurationParser(installationFilePath string) *ConfigurationParser {
 	is := InstallationSettings{}
 	b, _ := ioutil.ReadFile(installationFilePath)
-	json.Unmarshal(b, &is)
+	if err := json.Unmarshal(b, &is); err != nil {
+		lo.G.Error("Unmarshal installation settings error", err)
+	}
 
 	return &ConfigurationParser{
-		InstallationSettings: is,
+		installationSettings: is,
 	}
 }
 
@@ -21,16 +24,18 @@ func NewConfigurationParser(installationFilePath string) *ConfigurationParser {
 func NewConfigurationParserFromReader(settings io.Reader) *ConfigurationParser {
 	is := InstallationSettings{}
 	b, _ := ioutil.ReadAll(settings)
-	json.Unmarshal(b, &is)
+	if err := json.Unmarshal(b, &is); err != nil {
+		lo.G.Error("Unmarshal installation settings error", err)
+	}
 
 	return &ConfigurationParser{
-		InstallationSettings: is,
+		installationSettings: is,
 	}
 }
 
 //GetIaaS - get the iaas elements from the installation settings
 func (s *ConfigurationParser) GetIaaS() (config IaaSConfiguration, hasSSHKey bool) {
-	config = s.InstallationSettings.Infrastructure.IaaSConfig
+	config = s.installationSettings.Infrastructure.IaaSConfig
 	hasSSHKey = false
 
 	if config.SSHPrivateKey != "" {
@@ -84,5 +89,5 @@ func isPostgres(job string, instances []Instances) bool {
 
 //GetProducts - get the products array
 func (s *ConfigurationParser) GetProducts() (products []Products) {
-	return s.InstallationSettings.Products
+	return s.installationSettings.Products
 }
