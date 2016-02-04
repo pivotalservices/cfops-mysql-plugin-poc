@@ -23,19 +23,27 @@ var _ = Describe("Given MysqlPlugin", func() {
 			})
 		})
 	})
-	XDescribe("given a Setup() method", func() {
-		Context("given a PivotalCF contain a MySQL tile", func() {
+	Describe("given a Setup() method", func() {
+		Context("when called with a PivotalCF contain a MySQL tile", func() {
 			var pivotalCF cfopsplugin.PivotalCF
 			BeforeEach(func() {
 				pivotalCF = cfopsplugin.NewPivotalCF(cfbackup.NewConfigurationParser("./fixtures/installation-settings-1-6-aws.json"))
 				mysqlplugin.Setup(pivotalCF)
 			})
 
-			It("then it should extract information about the MySQL deployment required  for backup/restore", func() {
+			XIt("then it should extract Mysql username required for backup/restore", func() {
 				Ω(mysqlplugin.MysqlUserName).ShouldNot(BeEmpty())
+			})
+			XIt("then it should extract Mysql password required for backup/restore", func() {
 				Ω(mysqlplugin.MysqlPassword).ShouldNot(BeEmpty())
+			})
+			It("then it should extract Mysql VM IP required for backup/restore", func() {
 				Ω(mysqlplugin.MysqlIP).ShouldNot(BeEmpty())
+			})
+			XIt("then it should extract Mysql VM username required for backup/restore", func() {
 				Ω(mysqlplugin.VMUserName).ShouldNot(BeEmpty())
+			})
+			XIt("then it should extract Mysql VM Key or password required for backup/restore", func() {
 				Ω(func() bool {
 					return mysqlplugin.VMKey == "" && mysqlplugin.VMPassword == ""
 				}()).ShouldNot(BeTrue())

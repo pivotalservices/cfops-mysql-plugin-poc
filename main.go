@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"strings"
+
 	cfopsplugin "github.com/pivotalservices/cfops/plugin/cfopsplugin"
 )
 
@@ -9,7 +10,10 @@ func main() {
 	cfopsplugin.Start(new(MysqlPlugin))
 }
 
-const pluginName = "mysql-tile"
+const (
+	pluginName  = "mysql-tile"
+	productName = "p-mysql"
+)
 
 func NewMysqlPlugin() *MysqlPlugin {
 	return &MysqlPlugin{
@@ -20,13 +24,13 @@ func NewMysqlPlugin() *MysqlPlugin {
 }
 
 type MysqlPlugin struct {
-	Meta cfopsplugin.Meta
+	Meta          cfopsplugin.Meta
 	MysqlUserName string
 	MysqlPassword string
-	MysqlIP string
-	VMUserName string
-	VMKey string
-	VMPassword string
+	MysqlIP       string
+	VMUserName    string
+	VMKey         string
+	VMPassword    string
 }
 
 func (s *MysqlPlugin) GetMeta() (meta cfopsplugin.Meta) {
@@ -41,11 +45,17 @@ func (s *MysqlPlugin) Restore() (err error) {
 	return
 }
 
-func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
-	mySqlProduct := pcf.GetProducts()
-	fmt.Println(len(mySqlProduct))
-	for i, _ := range mySqlProduct{
-	fmt.Println(i)
+func (s *MysqlPlugin) setIP(ips map[string][]string) {
+	for vmName, ipList := range ips {
+		if strings.HasPrefix(vmName, "mysql-") {
+			s.MysqlIP = ipList[0]
+		}
 	}
+}
+
+func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
+	mySqlProduct := pcf.GetProducts()[productName]
+	s.setIP(mySqlProduct.IPS)
+
 	return
 }
