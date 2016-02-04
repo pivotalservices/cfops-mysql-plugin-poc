@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"strings"
 
 	"github.com/pivotalservices/cfbackup"
@@ -68,8 +67,8 @@ func (s *MysqlPlugin) setPersistanceBackup() (err error) {
 
 func (s *MysqlPlugin) Backup() (err error) {
 	//TODO complete this method but need a io.writer
-	var writer io.Writer
-	s.PersistanceBackup.Dump(writer)
+	/*var writer io.Writer
+	s.PersistanceBackup.Dump(writer)*/
 	return
 }
 func (s *MysqlPlugin) Restore() (err error) {
