@@ -1,9 +1,6 @@
 {
 	"ImportPath": "github.com/pivotalservices/cfops-mysql-plugin-poc",
 	"GoVersion": "go1.5",
-	"Packages": [
-		"./..."
-	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/cloudfoundry-community/go-cfenv",
@@ -46,8 +43,8 @@
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/cfbackup",
-			"Comment": "v0.1.0-115-g3dcdbcd",
-			"Rev": "3dcdbcdb3c08e36f6ba9f6f37ef41a3a38eb2176"
+			"Comment": "v0.1.0-116-g3fe3f2b",
+			"Rev": "3fe3f2bbf443eae111506876f50c22c6436efbdd"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/cfops/plugin/cfopsplugin",
