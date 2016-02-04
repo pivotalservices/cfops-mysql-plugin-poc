@@ -40,10 +40,10 @@ var _ = Describe("Given MysqlPlugin", func() {
 			It("then it should extract Mysql VM IP required for backup/restore", func() {
 				Ω(mysqlplugin.MysqlIP).ShouldNot(BeEmpty())
 			})
-			XIt("then it should extract Mysql VM username required for backup/restore", func() {
+			It("then it should extract Mysql VM username required for backup/restore", func() {
 				Ω(mysqlplugin.VMUserName).ShouldNot(BeEmpty())
 			})
-			XIt("then it should extract Mysql VM Key or password required for backup/restore", func() {
+			It("then it should extract Mysql VM Key or password required for backup/restore", func() {
 				Ω(func() bool {
 					return mysqlplugin.VMKey == "" && mysqlplugin.VMPassword == ""
 				}()).ShouldNot(BeTrue())
