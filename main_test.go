@@ -31,10 +31,10 @@ var _ = Describe("Given MysqlPlugin", func() {
 				mysqlplugin.Setup(pivotalCF)
 			})
 
-			XIt("then it should extract Mysql username required for backup/restore", func() {
+			It("then it should extract Mysql username required for backup/restore", func() {
 				Ω(mysqlplugin.MysqlUserName).ShouldNot(BeEmpty())
 			})
-			XIt("then it should extract Mysql password required for backup/restore", func() {
+			It("then it should extract Mysql password required for backup/restore", func() {
 				Ω(mysqlplugin.MysqlPassword).ShouldNot(BeEmpty())
 			})
 			It("then it should extract Mysql VM IP required for backup/restore", func() {
