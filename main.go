@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/pivotalservices/cfbackup"
@@ -103,6 +102,5 @@ func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
 	s.setIP(mySqlProduct.IPS)
 	s.setMysqlCredentials(mySqlProduct.Jobs)
 	s.setVMCredentials(mySqlProduct.Jobs)
-	fmt.Println(s)
 	return
 }
