@@ -49,6 +49,11 @@ var _ = Describe("Given MysqlPlugin", func() {
 				}()).ShouldNot(BeTrue())
 
 			})
+			It("then it should intialize a persistence backup", func() {
+				Ω(mysqlplugin.PersistanceBackup).ShouldNot(BeNil())
+			})
+
 		})
 	})
+
 })
