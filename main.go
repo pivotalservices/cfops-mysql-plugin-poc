@@ -12,10 +12,11 @@ import (
 )
 
 func main() {
-	cfopsplugin.Start(new(MysqlPlugin))
+	cfopsplugin.Start(NewMysqlPlugin())
 }
 
 const (
+	OutputFilePath           = "./mysql-backup/mysql.dmp"
 	pluginName               = "mysql-tile"
 	productName              = "p-mysql"
 	jobName                  = "mysql"
@@ -34,6 +35,7 @@ func NewMysqlDumper(user string, pass string, config command.SshConfig) (pb cfba
 
 func NewMysqlPlugin() *MysqlPlugin {
 	return &MysqlPlugin{
+		DestPath: OutputFilePath,
 		Meta: cfopsplugin.Meta{
 			Name: pluginName,
 		},
