@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io"
+	"os"
 	"strings"
 
 	"github.com/pivotalservices/cfbackup"
@@ -25,23 +27,30 @@ const (
 	defaultSSHPort       int = 22
 )
 
+func NewMysqlDumper(user string, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
+	pb, err = persistence.NewRemoteMysqlDump(user, pass, config)
+	return
+}
+
 func NewMysqlPlugin() *MysqlPlugin {
 	return &MysqlPlugin{
 		Meta: cfopsplugin.Meta{
 			Name: pluginName,
 		},
+		GetPersistanceBackup: NewMysqlDumper,
 	}
 }
 
 type MysqlPlugin struct {
-	Meta              cfopsplugin.Meta
-	MysqlUserName     string
-	MysqlPassword     string
-	MysqlIP           string
-	VMUserName        string
-	VMKey             string
-	VMPassword        string
-	PersistanceBackup cfbackup.PersistanceBackup
+	DestPath             string
+	Meta                 cfopsplugin.Meta
+	MysqlUserName        string
+	MysqlPassword        string
+	MysqlIP              string
+	VMUserName           string
+	VMKey                string
+	VMPassword           string
+	GetPersistanceBackup func(string, string, command.SshConfig) (cfbackup.PersistanceBackup, error)
 }
 
 func (s *MysqlPlugin) GetMeta() (meta cfopsplugin.Meta) {
@@ -60,15 +69,14 @@ func (s *MysqlPlugin) getSshConfig() (sshConfig command.SshConfig) {
 	return
 }
 
-func (s *MysqlPlugin) setPersistanceBackup() (err error) {
-	s.PersistanceBackup, err = persistence.NewRemoteMysqlDump(s.MysqlUserName, s.MysqlPassword, s.getSshConfig())
-	return
-}
-
 func (s *MysqlPlugin) Backup() (err error) {
-	//TODO complete this method but need a io.writer
-	/*var writer io.Writer
-	s.PersistanceBackup.Dump(writer)*/
+	var writer io.Writer
+	var persistanceBackuper cfbackup.PersistanceBackup
+	if persistanceBackuper, err = s.GetPersistanceBackup(s.MysqlUserName, s.MysqlPassword, s.getSshConfig()); err == nil {
+		if writer, err = os.Create(s.DestPath); err == nil {
+			err = persistanceBackuper.Dump(writer)
+		}
+	}
 	return
 }
 func (s *MysqlPlugin) Restore() (err error) {
@@ -125,6 +133,5 @@ func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
 	s.setIP(mySqlProduct.IPS)
 	s.setMysqlCredentials(mySqlProduct.Jobs)
 	s.setVMCredentials(mySqlProduct.Jobs)
-	s.setPersistanceBackup()
 	return
 }

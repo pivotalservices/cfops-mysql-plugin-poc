@@ -1,11 +1,15 @@
 package main_test
 
 import (
+	"os"
+	"path"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotalservices/cfbackup"
 	. "github.com/pivotalservices/cfops-mysql-plugin-poc"
 	"github.com/pivotalservices/cfops/plugin/cfopsplugin"
+	"github.com/pivotalservices/gtils/command"
 )
 
 var _ = Describe("Given MysqlPlugin", func() {
@@ -23,8 +27,32 @@ var _ = Describe("Given MysqlPlugin", func() {
 			})
 		})
 	})
+
+	Describe("given a Backup() method", func() {
+		Context("when called on a properly setup mysqlplugin object", func() {
+			var err error
+			backupPath := path.Join(os.TempDir(), "mysql-backup")
+			fakePersistenceBackup := new(FakePersistenceBackup)
+			BeforeEach(func() {
+				mysqlplugin = &MysqlPlugin{
+					DestPath: backupPath,
+					Meta: cfopsplugin.Meta{
+						Name: "mysql-tile",
+					},
+					GetPersistanceBackup: func(user, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
+						return fakePersistenceBackup, nil
+					},
+				}
+				err = mysqlplugin.Backup()
+			})
+			It("then it should dump the target mysql contents", func() {
+				Ω(fakePersistenceBackup.DumpCallCount).Should(Equal(1))
+			})
+		})
+	})
+
 	Describe("given a Setup() method", func() {
-		Context("when called with a PivotalCF contain a MySQL tile", func() {
+		Context("when called with a PivotalCF containing a MySQL tile", func() {
 			var pivotalCF cfopsplugin.PivotalCF
 			BeforeEach(func() {
 				pivotalCF = cfopsplugin.NewPivotalCF(cfbackup.NewConfigurationParser("./fixtures/installation-settings-1-6-aws.json"))
@@ -48,9 +76,6 @@ var _ = Describe("Given MysqlPlugin", func() {
 					return mysqlplugin.VMKey == "" && mysqlplugin.VMPassword == ""
 				}()).ShouldNot(BeTrue())
 
-			})
-			It("then it should intialize a persistence backup", func() {
-				Ω(mysqlplugin.PersistanceBackup).ShouldNot(BeNil())
 			})
 
 		})
