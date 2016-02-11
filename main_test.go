@@ -1,14 +1,16 @@
 package main_test
 
 import (
+	"io"
+	"io/ioutil"
 	"os"
-	"path"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotalservices/cfbackup"
 	. "github.com/pivotalservices/cfops-mysql-plugin-poc"
 	"github.com/pivotalservices/cfops/plugin/cfopsplugin"
+	"github.com/pivotalservices/cfops/tileregistry"
 	"github.com/pivotalservices/gtils/command"
 )
 
@@ -31,11 +33,11 @@ var _ = Describe("Given MysqlPlugin", func() {
 	Describe("given a Backup() method", func() {
 		Context("when called on a properly setup mysqlplugin object", func() {
 			var err error
-			backupPath := path.Join(os.TempDir(), "mysql-backup")
 			fakePersistenceBackup := new(FakePersistenceBackup)
+			var controlTmpDir string
 			BeforeEach(func() {
+				controlTmpDir, _ = ioutil.TempDir("", "unit-test")
 				mysqlplugin = &MysqlPlugin{
-					DestPath: backupPath,
 					Meta: cfopsplugin.Meta{
 						Name: "mysql-tile",
 					},
@@ -43,10 +45,23 @@ var _ = Describe("Given MysqlPlugin", func() {
 						return fakePersistenceBackup, nil
 					},
 				}
+				pivotalCF := cfopsplugin.NewPivotalCF(cfbackup.NewConfigurationParser("./fixtures/installation-settings-1-6-aws.json"), tileregistry.TileSpec{
+					ArchiveDirectory: controlTmpDir,
+				})
+				mysqlplugin.Setup(pivotalCF)
 				err = mysqlplugin.Backup()
 			})
+
+			AfterEach(func() {
+				os.RemoveAll(controlTmpDir)
+			})
+
 			It("then it should dump the target mysql contents", func() {
 				Ω(fakePersistenceBackup.DumpCallCount).Should(Equal(1))
+			})
+
+			It("then it should create an archive file", func() {
+				Ω(IsEmpty(controlTmpDir)).ShouldNot(BeTrue())
 			})
 		})
 	})
@@ -55,7 +70,7 @@ var _ = Describe("Given MysqlPlugin", func() {
 		Context("when called with a PivotalCF containing a MySQL tile", func() {
 			var pivotalCF cfopsplugin.PivotalCF
 			BeforeEach(func() {
-				pivotalCF = cfopsplugin.NewPivotalCF(cfbackup.NewConfigurationParser("./fixtures/installation-settings-1-6-aws.json"))
+				pivotalCF = cfopsplugin.NewPivotalCF(cfbackup.NewConfigurationParser("./fixtures/installation-settings-1-6-aws.json"), tileregistry.TileSpec{})
 				mysqlplugin.Setup(pivotalCF)
 			})
 
@@ -82,3 +97,17 @@ var _ = Describe("Given MysqlPlugin", func() {
 	})
 
 })
+
+func IsEmpty(name string) bool {
+	f, err := os.Open(name)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+
+	_, err = f.Readdir(1)
+	if err == io.EOF {
+		return true
+	}
+	return false // Either not empty or error, suits both cases
+}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"os"
 	"strings"
 
 	"github.com/pivotalservices/cfbackup"
@@ -15,9 +14,39 @@ func main() {
 	cfopsplugin.Start(NewMysqlPlugin())
 }
 
+func (s *MysqlPlugin) GetMeta() (meta cfopsplugin.Meta) {
+	meta = s.Meta
+	return
+}
+
+func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
+	mySqlProduct := pcf.GetProducts()[productName]
+	s.PivotalCF = pcf
+	s.setIP(mySqlProduct.IPS)
+	s.setMysqlCredentials(mySqlProduct.Jobs)
+	s.setVMCredentials(mySqlProduct.Jobs)
+	return
+}
+
+func (s *MysqlPlugin) Backup() (err error) {
+	var writer io.WriteCloser
+	var persistanceBackuper cfbackup.PersistanceBackup
+	if persistanceBackuper, err = s.GetPersistanceBackup(s.MysqlUserName, s.MysqlPassword, s.getSshConfig()); err == nil {
+		if writer, err = s.PivotalCF.NewArchiveWriter(outputFileName); err == nil {
+			defer writer.Close()
+			err = persistanceBackuper.Dump(writer)
+		}
+	}
+	return
+}
+
+func (s *MysqlPlugin) Restore() (err error) {
+	return
+}
+
 const (
-	OutputFilePath           = "./mysql-backup/mysql.dmp"
 	pluginName               = "mysql-tile"
+	outputFileName           = pluginName + ".dmp"
 	productName              = "p-mysql"
 	jobName                  = "mysql"
 	vmCredentialsName        = "vm_credentials"
@@ -28,23 +57,17 @@ const (
 	defaultSSHPort       int = 22
 )
 
-func NewMysqlDumper(user string, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
-	pb, err = persistence.NewRemoteMysqlDump(user, pass, config)
-	return
-}
-
 func NewMysqlPlugin() *MysqlPlugin {
 	return &MysqlPlugin{
-		DestPath: OutputFilePath,
 		Meta: cfopsplugin.Meta{
 			Name: pluginName,
 		},
-		GetPersistanceBackup: NewMysqlDumper,
+		GetPersistanceBackup: newMysqlDumper,
 	}
 }
 
 type MysqlPlugin struct {
-	DestPath             string
+	PivotalCF            cfopsplugin.PivotalCF
 	Meta                 cfopsplugin.Meta
 	MysqlUserName        string
 	MysqlPassword        string
@@ -53,11 +76,6 @@ type MysqlPlugin struct {
 	VMKey                string
 	VMPassword           string
 	GetPersistanceBackup func(string, string, command.SshConfig) (cfbackup.PersistanceBackup, error)
-}
-
-func (s *MysqlPlugin) GetMeta() (meta cfopsplugin.Meta) {
-	meta = s.Meta
-	return
 }
 
 func (s *MysqlPlugin) getSshConfig() (sshConfig command.SshConfig) {
@@ -71,22 +89,9 @@ func (s *MysqlPlugin) getSshConfig() (sshConfig command.SshConfig) {
 	return
 }
 
-func (s *MysqlPlugin) Backup() (err error) {
-	var writer io.Writer
-	var persistanceBackuper cfbackup.PersistanceBackup
-	if persistanceBackuper, err = s.GetPersistanceBackup(s.MysqlUserName, s.MysqlPassword, s.getSshConfig()); err == nil {
-		if writer, err = os.Create(s.DestPath); err == nil {
-			err = persistanceBackuper.Dump(writer)
-		}
-	}
-	return
-}
-func (s *MysqlPlugin) Restore() (err error) {
-	return
-}
-
 func (s *MysqlPlugin) setIP(ips map[string][]string) {
 	for vmName, ipList := range ips {
+
 		if strings.HasPrefix(vmName, mysqlPrefixName) {
 			s.MysqlIP = ipList[0]
 		}
@@ -95,45 +100,39 @@ func (s *MysqlPlugin) setIP(ips map[string][]string) {
 
 func (s *MysqlPlugin) getMysqlProperties(jobsList []cfbackup.Jobs) (mysqlProperties []cfbackup.Properties) {
 	for _, job := range jobsList {
+
 		if job.Identifier == jobName {
 			mysqlProperties = job.Properties
 		}
 	}
 	return
 }
+
 func (s *MysqlPlugin) setMysqlCredentials(jobsList []cfbackup.Jobs) {
 	mysqlProperties := s.getMysqlProperties(jobsList)
 
 	for _, property := range mysqlProperties {
-		if property.Identifier == mysqlCredentialsName {
 
+		if property.Identifier == mysqlCredentialsName {
 			s.MysqlUserName = property.Value.(map[string]interface{})[identityName].(string)
 			s.MysqlPassword = property.Value.(map[string]interface{})[passwordName].(string)
-
 		}
-
 	}
-
 }
 
 func (s *MysqlPlugin) setVMCredentials(jobsList []cfbackup.Jobs) {
 	mysqlProperties := s.getMysqlProperties(jobsList)
 
 	for _, property := range mysqlProperties {
-		if property.Identifier == vmCredentialsName {
 
+		if property.Identifier == vmCredentialsName {
 			s.VMUserName = property.Value.(map[string]interface{})[identityName].(string)
 			s.VMPassword = property.Value.(map[string]interface{})[passwordName].(string)
-
 		}
-
 	}
-
 }
-func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
-	mySqlProduct := pcf.GetProducts()[productName]
-	s.setIP(mySqlProduct.IPS)
-	s.setMysqlCredentials(mySqlProduct.Jobs)
-	s.setVMCredentials(mySqlProduct.Jobs)
+
+func newMysqlDumper(user string, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
+	pb, err = persistence.NewRemoteMysqlDump(user, pass, config)
 	return
 }
