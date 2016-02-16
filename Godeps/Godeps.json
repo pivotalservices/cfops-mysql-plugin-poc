@@ -46,18 +46,18 @@
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/cfbackup",
-			"Comment": "v0.1.0-121-g1b38932",
-			"Rev": "1b389320e008dadeb7f60ab75d431d5320bca049"
+			"Comment": "v0.1.0-123-g9ebed62",
+			"Rev": "9ebed6298151086b67f238f71fa458d0339cf3f9"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/cfops/plugin/cfopsplugin",
-			"Comment": "v2.0.42-35-g0335aa6",
-			"Rev": "0335aa6d74a22a6ca026f77eb57c1222807fe3a7"
+			"Comment": "v2.0.42-38-gc1ab6c8",
+			"Rev": "c1ab6c8919a46e417b74b8802b995aa68d1d73f3"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/cfops/tileregistry",
-			"Comment": "v2.0.42-35-g0335aa6",
-			"Rev": "0335aa6d74a22a6ca026f77eb57c1222807fe3a7"
+			"Comment": "v2.0.42-38-gc1ab6c8",
+			"Rev": "c1ab6c8919a46e417b74b8802b995aa68d1d73f3"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/gtils/bosh",
