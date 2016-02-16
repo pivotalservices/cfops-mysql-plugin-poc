@@ -75,22 +75,7 @@ var _ = Describe("Given MysqlPlugin", func() {
 			})
 
 			It("then it should extract Mysql username required for backup/restore", func() {
-				Ω(mysqlplugin.MysqlUserName).ShouldNot(BeEmpty())
-			})
-			It("then it should extract Mysql password required for backup/restore", func() {
-				Ω(mysqlplugin.MysqlPassword).ShouldNot(BeEmpty())
-			})
-			It("then it should extract Mysql VM IP required for backup/restore", func() {
-				Ω(mysqlplugin.MysqlIP).ShouldNot(BeEmpty())
-			})
-			It("then it should extract Mysql VM username required for backup/restore", func() {
-				Ω(mysqlplugin.VMUserName).ShouldNot(BeEmpty())
-			})
-			It("then it should extract Mysql VM Key or password required for backup/restore", func() {
-				Ω(func() bool {
-					return mysqlplugin.VMKey == "" && mysqlplugin.VMPassword == ""
-				}()).ShouldNot(BeTrue())
-
+				Ω(mysqlplugin.PivotalCF).ShouldNot(BeNil())
 			})
 
 		})
