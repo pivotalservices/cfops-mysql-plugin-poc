@@ -23,8 +23,8 @@ func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
 	mySqlProduct := pcf.GetProducts()[productName]
 	s.PivotalCF = pcf
 	s.setIP(mySqlProduct.IPS)
-	s.setMysqlCredentials(mySqlProduct.Jobs)
-	s.setVMCredentials(mySqlProduct.Jobs)
+	s.setMysqlCredentials()
+	s.setVMCredentials()
 	return
 }
 
@@ -98,38 +98,25 @@ func (s *MysqlPlugin) setIP(ips map[string][]string) {
 	}
 }
 
-func (s *MysqlPlugin) getMysqlProperties(jobsList []cfbackup.Jobs) (mysqlProperties []cfbackup.Properties) {
-	for _, job := range jobsList {
-
-		if job.Identifier == jobName {
-			mysqlProperties = job.Properties
-		}
+func (s *MysqlPlugin) setMysqlCredentials() (err error) {
+	var props map[string]string
+	props, err = s.PivotalCF.GetPropertyValues(productName, jobName, mysqlCredentialsName)
+	if err == nil {
+		s.MysqlUserName = props[identityName]
+		s.MysqlPassword = props[passwordName]
 	}
 	return
 }
 
-func (s *MysqlPlugin) setMysqlCredentials(jobsList []cfbackup.Jobs) {
-	mysqlProperties := s.getMysqlProperties(jobsList)
-
-	for _, property := range mysqlProperties {
-
-		if property.Identifier == mysqlCredentialsName {
-			s.MysqlUserName = property.Value.(map[string]interface{})[identityName].(string)
-			s.MysqlPassword = property.Value.(map[string]interface{})[passwordName].(string)
-		}
+func (s *MysqlPlugin) setVMCredentials() (err error) {
+	var props map[string]string
+	props, err = s.PivotalCF.GetPropertyValues(productName, jobName, vmCredentialsName)
+	if err == nil {
+		s.VMUserName = props[identityName]
+		s.VMPassword = props[passwordName]
 	}
-}
 
-func (s *MysqlPlugin) setVMCredentials(jobsList []cfbackup.Jobs) {
-	mysqlProperties := s.getMysqlProperties(jobsList)
-
-	for _, property := range mysqlProperties {
-
-		if property.Identifier == vmCredentialsName {
-			s.VMUserName = property.Value.(map[string]interface{})[identityName].(string)
-			s.VMPassword = property.Value.(map[string]interface{})[passwordName].(string)
-		}
-	}
+	return
 }
 
 func newMysqlDumper(user string, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
