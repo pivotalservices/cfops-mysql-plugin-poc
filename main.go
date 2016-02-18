@@ -7,6 +7,7 @@ import (
 	cfopsplugin "github.com/pivotalservices/cfops/plugin/cfopsplugin"
 	"github.com/pivotalservices/gtils/command"
 	"github.com/pivotalservices/gtils/persistence"
+	"github.com/xchapter7x/lo"
 )
 
 func main() {
@@ -48,18 +49,41 @@ func (s *MysqlPlugin) Backup() (err error) {
 }
 
 func (s *MysqlPlugin) Restore() (err error) {
+	var reader io.ReadCloser
+	var persistanceBackuper cfbackup.PersistanceBackup
+	var sshConfig command.SshConfig
+	var mysqlUserName, mysqlPassword string
+
+	sshConfig, err = s.PivotalCF.GetSSHConfig(productName, jobName)
+	if err != nil {
+		return
+	}
+
+	mysqlUserName, mysqlPassword, err = s.getMysqlCredentials()
+	if err != nil {
+		return
+	}
+
+	lo.G.Info("restoring to %s using %s and %s", sshConfig.Host, sshConfig.Username, sshConfig.Password)
+	if persistanceBackuper, err = s.GetPersistanceBackup(mysqlUserName, mysqlPassword, sshConfig); err == nil {
+		if reader, err = s.PivotalCF.NewArchiveReader(outputFileName); err == nil {
+			defer reader.Close()
+			err = persistanceBackuper.Import(reader)
+		}
+	}
 	return
 }
 
 const (
-	pluginName               = "mysql-tile"
-	outputFileName           = pluginName + ".dmp"
-	productName              = "p-mysql"
-	jobName                  = "mysql"
-	mysqlCredentialsName     = "mysql_admin_password"
-	identityName             = "identity"
-	passwordName             = "password"
-	defaultSSHPort       int = 22
+	pluginName                 = "mysql-tile"
+	outputFileName             = pluginName + ".dmp"
+	productName                = "p-mysql"
+	jobName                    = "mysql"
+	mysqlCredentialsName       = "mysql_admin_password"
+	identityName               = "identity"
+	passwordName               = "password"
+	defaultSSHPort         int = 22
+	mysqlRemoteArchivePath     = "/var/vcap/store/mysql/archive.backup"
 )
 
 func NewMysqlPlugin() *MysqlPlugin {
@@ -88,6 +112,6 @@ func (s *MysqlPlugin) getMysqlCredentials() (userName, pwd string, err error) {
 }
 
 func newMysqlDumper(user string, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
-	pb, err = persistence.NewRemoteMysqlDump(user, pass, config)
+	pb, err = persistence.NewRemoteMysqlDumpWithPath(user, pass, config,mysqlRemoteArchivePath)
 	return
 }
