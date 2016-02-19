@@ -7,7 +7,6 @@ import (
 	cfopsplugin "github.com/pivotalservices/cfops/plugin/cfopsplugin"
 	"github.com/pivotalservices/gtils/command"
 	"github.com/pivotalservices/gtils/persistence"
-	"github.com/xchapter7x/lo"
 )
 
 func main() {
@@ -64,7 +63,6 @@ func (s *MysqlPlugin) Restore() (err error) {
 		return
 	}
 
-	lo.G.Info("restoring to %s using %s and %s", sshConfig.Host, sshConfig.Username, sshConfig.Password)
 	if persistanceBackuper, err = s.GetPersistanceBackup(mysqlUserName, mysqlPassword, sshConfig); err == nil {
 		if reader, err = s.PivotalCF.NewArchiveReader(outputFileName); err == nil {
 			defer reader.Close()
@@ -112,6 +110,6 @@ func (s *MysqlPlugin) getMysqlCredentials() (userName, pwd string, err error) {
 }
 
 func newMysqlDumper(user string, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
-	pb, err = persistence.NewRemoteMysqlDumpWithPath(user, pass, config,mysqlRemoteArchivePath)
+	pb, err = persistence.NewRemoteMysqlDumpWithPath(user, pass, config, mysqlRemoteArchivePath)
 	return
 }
