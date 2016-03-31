@@ -102,23 +102,29 @@ deploy:
         release_id: $WERCKER_GITHUB_CREATE_RELEASE_ID
         content-type: application/x-gzip
 
+    - script:
+        name: get latest tag
+        code: |
+          export VERSION_TAG="$(git describe --abbrev=0 --tags)"
+          echo ${VERSION_TAG}
+          
     - s3sync:
         key-id: $S3_KEY
         key-secret: $S3_SECRET
-        bucket-url: ${S3_BUCKET}/${S3_FOLDER}/linux64/${WERCKER_GITHUB_CREATE_RELEASE_ID}/
+        bucket-url: ${S3_BUCKET}/${S3_FOLDER}/linux64/${VERSION_TAG}/
         source-dir: ./${BUILD_DIR}/linux64
         delete-removed: false
 
     - s3sync:
         key-id: $S3_KEY
         key-secret: $S3_SECRET
-        bucket-url: ${S3_BUCKET}/${S3_FOLDER}/osx/${WERCKER_GITHUB_CREATE_RELEASE_ID}/
+        bucket-url: ${S3_BUCKET}/${S3_FOLDER}/osx/${VERSION_TAG}/
         source-dir: ./${BUILD_DIR}/osx
         delete-removed: false
 
     - s3sync:
         key-id: $S3_KEY
         key-secret: $S3_SECRET
-        bucket-url: ${S3_BUCKET}/${S3_FOLDER}/win64/${WERCKER_GITHUB_CREATE_RELEASE_ID}/
+        bucket-url: ${S3_BUCKET}/${S3_FOLDER}/win64/${VERSION_TAG}/
         source-dir: ./${BUILD_DIR}/win64
         delete-removed: false
