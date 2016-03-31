@@ -105,7 +105,7 @@ deploy:
     - script:
         name: get latest tag
         code: |
-          git pull
+          git pull origin master
           export VERSION_TAG="$(git describe --abbrev=0 --tags)"
           echo ${VERSION_TAG}
 
