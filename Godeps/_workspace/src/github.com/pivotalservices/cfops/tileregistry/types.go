@@ -18,5 +18,8 @@ type (
 		OpsManagerUser    string
 		OpsManagerPass    string
 		ArchiveDirectory  string
+		CryptKey          string
+		ClearBoshManifest bool
+		PluginArgs        string
 	}
 )
