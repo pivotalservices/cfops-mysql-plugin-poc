@@ -51,13 +51,13 @@
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/cfops/plugin/cfopsplugin",
-			"Comment": "v2.1.12-1-gbebd6d5",
-			"Rev": "bebd6d54f60cd44e67dd7f44f5a8a9f67c1594d4"
+			"Comment": "v2.2.0-1-g66cdf51",
+			"Rev": "66cdf5198f55357e6f6362b902f0aa9d438902a8"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/cfops/tileregistry",
-			"Comment": "v2.1.12-1-gbebd6d5",
-			"Rev": "bebd6d54f60cd44e67dd7f44f5a8a9f67c1594d4"
+			"Comment": "v2.2.0-1-g66cdf51",
+			"Rev": "66cdf5198f55357e6f6362b902f0aa9d438902a8"
 		},
 		{
 			"ImportPath": "github.com/pivotalservices/gtils/bosh",

@@ -7,6 +7,7 @@ import (
 	cfopsplugin "github.com/pivotalservices/cfops/plugin/cfopsplugin"
 	"github.com/pivotalservices/gtils/command"
 	"github.com/pivotalservices/gtils/persistence"
+	"github.com/xchapter7x/lo"
 )
 
 func main() {
@@ -21,8 +22,10 @@ func (s *MysqlPlugin) GetMeta() (meta cfopsplugin.Meta) {
 
 //Setup - on setup method
 func (s *MysqlPlugin) Setup(pcf cfopsplugin.PivotalCF) (err error) {
+	lo.G.Debug("Starting setup of mysql-tile")
 	s.PivotalCF = pcf
 	s.InstallationSettings = pcf.GetInstallationSettings()
+	lo.G.Debug("Finished setup of mysql-tile", err)
 	return
 }
 
@@ -48,6 +51,7 @@ func (s *MysqlPlugin) getSSHConfig() (sshConfig []command.SshConfig, err error) 
 
 //Backup - method to execute backup
 func (s *MysqlPlugin) Backup() (err error) {
+	lo.G.Debug("Starting backup of mysql-tile")
 	var writer io.WriteCloser
 	var persistanceBackuper cfbackup.PersistanceBackup
 	var mysqlUserName, mysqlPassword string
@@ -56,25 +60,25 @@ func (s *MysqlPlugin) Backup() (err error) {
 	if sshConfigs, err = s.getSSHConfig(); err == nil {
 		//take first node to execute backup on
 		sshConfig := sshConfigs[0]
-		mysqlUserName, mysqlPassword, err = s.getMysqlCredentials()
-		if err != nil {
-			return
-		}
-
-		if persistanceBackuper, err = s.GetPersistanceBackup(mysqlUserName, mysqlPassword, sshConfig); err == nil {
-			if writer, err = s.PivotalCF.NewArchiveWriter(outputFileName); err == nil {
-				defer writer.Close()
-				err = persistanceBackuper.Dump(writer)
+		if mysqlUserName, mysqlPassword, err = s.getMysqlCredentials(); err == nil {
+			lo.G.Debug("Successfully got mysqlCredentials")
+			if persistanceBackuper, err = s.GetPersistanceBackup(mysqlUserName, mysqlPassword, sshConfig); err == nil {
+				if writer, err = s.PivotalCF.NewArchiveWriter(outputFileName); err == nil {
+					defer writer.Close()
+					lo.G.Debug("Starting mysql dump")
+					err = persistanceBackuper.Dump(writer)
+					lo.G.Debug("Dump finished", err)
+				}
 			}
 		}
-
 	}
-
+	lo.G.Debug("Finished backup of mysql-tile", err)
 	return
 }
 
 //Restore - method to execute restore
 func (s *MysqlPlugin) Restore() (err error) {
+	lo.G.Debug("Starting restore of mysql-tile")
 	var reader io.ReadCloser
 	var persistanceBackuper cfbackup.PersistanceBackup
 	var mysqlUserName, mysqlPassword string
@@ -85,19 +89,16 @@ func (s *MysqlPlugin) Restore() (err error) {
 		//take first node to execute restore on
 		sshConfig := sshConfigs[0]
 
-		mysqlUserName, mysqlPassword, err = s.getMysqlCredentials()
-		if err != nil {
-			return
-		}
-		if persistanceBackuper, err = s.GetPersistanceBackup(mysqlUserName, mysqlPassword, sshConfig); err == nil {
-			if reader, err = s.PivotalCF.NewArchiveReader(outputFileName); err == nil {
-				defer reader.Close()
-				err = persistanceBackuper.Import(reader)
+		if mysqlUserName, mysqlPassword, err = s.getMysqlCredentials(); err == nil {
+			if persistanceBackuper, err = s.GetPersistanceBackup(mysqlUserName, mysqlPassword, sshConfig); err == nil {
+				if reader, err = s.PivotalCF.NewArchiveReader(outputFileName); err == nil {
+					defer reader.Close()
+					err = persistanceBackuper.Import(reader)
+				}
 			}
 		}
-
 	}
-
+	lo.G.Debug("Finished restore of mysql-tile", err)
 	return
 }
 
