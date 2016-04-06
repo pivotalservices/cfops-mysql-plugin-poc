@@ -64,10 +64,12 @@ func testInstallationSettings(installationSettingsPath string) {
 				})
 
 				It("then it should dump the target mysql contents", func() {
+					Ω(err).ShouldNot(HaveOccurred())
 					Ω(fakePersistenceBackup.DumpCallCount).Should(Equal(1))
 				})
 
 				It("then it should create an archive file", func() {
+					Ω(err).ShouldNot(HaveOccurred())
 					Ω(IsEmpty(controlTmpDir)).ShouldNot(BeTrue())
 				})
 			})

@@ -139,7 +139,7 @@ func CleanupClients() {
 		}(client)
 	}
 
-	log.Println("[DEBUG] waiting for all plugin processes to complete...")
+	log.Println("[DEBUG] plugin: waiting for all plugin processes to complete...")
 	wg.Wait()
 }
 
@@ -297,12 +297,12 @@ func (c *Client) Start() (addr net.Addr, err error) {
 		conn.Close()
 
 		// Goroutine to mark exit status
-		go func() {
+		go func(pid int) {
 			// Wait for the process to die
-			p.Wait()
+			pidWait(pid)
 
 			// Log so we can see it
-			log.Printf("[DEBUG] reattached plugin process exited\n")
+			log.Printf("[DEBUG] plugin: reattached plugin process exited\n")
 
 			// Mark it
 			c.l.Lock()
@@ -311,7 +311,7 @@ func (c *Client) Start() (addr net.Addr, err error) {
 
 			// Close the logging channel since that doesn't work on reattach
 			close(c.doneLogging)
-		}()
+		}(p.Pid)
 
 		// Set the address and process
 		c.address = c.config.Reattach.Addr
@@ -336,7 +336,7 @@ func (c *Client) Start() (addr net.Addr, err error) {
 	cmd.Stderr = stderr_w
 	cmd.Stdout = stdout_w
 
-	log.Printf("[DEBUG] Starting plugin: %s %#v", cmd.Path, cmd.Args)
+	log.Printf("[DEBUG] plugin: starting plugin: %s %#v", cmd.Path, cmd.Args)
 	err = cmd.Start()
 	if err != nil {
 		return
@@ -370,7 +370,7 @@ func (c *Client) Start() (addr net.Addr, err error) {
 		cmd.Wait()
 
 		// Log and make sure to flush the logs write away
-		log.Printf("[DEBUG] %s: plugin process exited\n", cmd.Path)
+		log.Printf("[DEBUG] plugin: %s: plugin process exited\n", cmd.Path)
 		os.Stderr.Sync()
 
 		// Mark that we exited
@@ -417,7 +417,7 @@ func (c *Client) Start() (addr net.Addr, err error) {
 	timeout := time.After(c.config.StartTimeout)
 
 	// Start looking for the address
-	log.Printf("[DEBUG] Waiting for RPC address for: %s", cmd.Path)
+	log.Printf("[DEBUG] plugin: waiting for RPC address for: %s", cmd.Path)
 	select {
 	case <-timeout:
 		err = errors.New("timeout while waiting for plugin to start")
@@ -493,11 +493,18 @@ func (c *Client) ReattachConfig() *ReattachConfig {
 	c.l.Lock()
 	defer c.l.Unlock()
 
-	if c.address == nil || c.config.Cmd.Process == nil {
+	if c.address == nil {
 		return nil
 	}
 
-	// TODO: if we connected wit reattach, return that
+	if c.config.Cmd != nil && c.config.Cmd.Process == nil {
+		return nil
+	}
+
+	// If we connected via reattach, just return the information as-is
+	if c.config.Reattach != nil {
+		return c.config.Reattach
+	}
 
 	return &ReattachConfig{
 		Addr: c.address,
@@ -513,7 +520,7 @@ func (c *Client) logStderr(r io.Reader) {
 			c.config.Stderr.Write([]byte(line))
 
 			line = strings.TrimRightFunc(line, unicode.IsSpace)
-			log.Printf("[DEBUG] %s: %s", filepath.Base(c.config.Cmd.Path), line)
+			log.Printf("[DEBUG] plugin: %s: %s", filepath.Base(c.config.Cmd.Path), line)
 		}
 
 		if err == io.EOF {
