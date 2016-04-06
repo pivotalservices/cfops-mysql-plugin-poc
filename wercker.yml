@@ -5,7 +5,8 @@ build:
     # Sets the go workspace and places you package
     # at the right place in the workspace tree
     - setup-go-workspace
-    - wercker/golint
+    - wercker/golint:
+        exclude: "^vendor\\|fakes"
 
     # Get the dependencies
     - script:
@@ -13,14 +14,15 @@ build:
         code: |
           cd $WERCKER_SOURCE_DIR
           go version
-          go get -u github.com/tools/godep
+          go get github.com/Masterminds/glide
           export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+          glide install
 
     # Test the project
     - script:
         name: go test
         code: |
-          godep go test ./... -v -race
+          go test $(glide novendor) -v -race -cover
 
     # Setting the coverage watermark low.
     # This should be raised as we gain more coverage...
@@ -28,14 +30,14 @@ build:
     - script:
         name: go test cover
         code: |
-          ./testCoverage ./... $COVERAGE_WATERMARK
+          ./testCoverage $(glide novendor) $COVERAGE_WATERMARK
 
     # lets make sure we can build
     # the main executable (later we can cross compile and upload)
     - script:
         name: go smoke build
         code: |
-          (godep go build)
+          (go build)
 
     - script:
         name: add repo to artifact
@@ -52,9 +54,9 @@ build:
     - script:
         name: cross platform release
         code: |
-          (GOOS=linux GOARCH=amd64 godep go build -ldflags "-X main.VERSION=${NEXT_VERSION}" && mkdir -p ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/linux64 && mv cfops-mysql-plugin ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/linux64)
-          (GOOS=darwin GOARCH=amd64 godep go build -ldflags "-X main.VERSION=${NEXT_VERSION}" && mkdir -p ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/osx && mv cfops-mysql-plugin ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/osx)
-          (GOOS=windows GOARCH=amd64 godep go build -ldflags "-X main.VERSION=${NEXT_VERSION}" && mkdir -p ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/win64 && mv cfops-mysql-plugin.exe ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/win64)
+          (GOOS=linux GOARCH=amd64 go build -ldflags "-X main.VERSION=${NEXT_VERSION}" && mkdir -p ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/linux64 && mv cfops-mysql-plugin ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/linux64)
+          (GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.VERSION=${NEXT_VERSION}" && mkdir -p ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/osx && mv cfops-mysql-plugin ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/osx)
+          (GOOS=windows GOARCH=amd64 go build -ldflags "-X main.VERSION=${NEXT_VERSION}" && mkdir -p ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/win64 && mv cfops-mysql-plugin.exe ${WERCKER_OUTPUT_DIR}/${BUILD_DIR}/win64)
 
     - script:
         name: create tarball

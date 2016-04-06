@@ -1,0 +1,61 @@
+hash: 50561f9dd677876c3382da06e36c5d8463fb887856f4eab29be7e42a95bc1862
+updated: 2016-04-06T15:52:04.559338385-04:00
+imports:
+- name: github.com/cloudfoundry-community/go-cfenv
+  version: b4bebec47a425334d2a076cf99329464c9e611f3
+- name: github.com/hashicorp/go-plugin
+  version: a76fe2078cae6ff99c99180785e7605f7fd0dc30
+- name: github.com/hashicorp/yamux
+  version: df949784da9ed028ee76df44652e42d37a09d7e4
+- name: github.com/kr/fs
+  version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
+- name: github.com/mitchellh/mapstructure
+  version: 281073eb9eb092240d33ef253c404f1cca550309
+- name: github.com/onsi/ginkgo
+  version: 105b4823ee2cbebc2b5c562d9ac50694ecc2c689
+- name: github.com/onsi/gomega
+  version: 7ce781ea776b2fd506491011353bded2e40c8467
+- name: github.com/op/go-logging
+  version: dfaf3dff9b631bc4236201d90d41ee0de9202889
+- name: github.com/pivotal-golang/lager
+  version: 95b2ada4cdf781bdcf07e5207879e034ac8c5314
+- name: github.com/pivotalservices/cfbackup
+  version: 84923910affe661ebf293f9ab1777543479c343e
+  subpackages:
+  - tiles/opsmanager
+- name: github.com/pivotalservices/cfops
+  version: 7ffc7d1ba58c06fad47a440475885243b84dfacb
+  subpackages:
+  - plugin/cfopsplugin
+  - tileregistry
+- name: github.com/pivotalservices/gtils
+  version: fc2595bd78d37dab40ac4520052b1bf5794db25e
+  subpackages:
+  - command
+  - persistence
+  - bosh
+  - http
+  - osutils
+  - storage
+  - log
+  - uaa
+- name: github.com/pkg/sftp
+  version: 8a7343c6ed99a2934aea9c08c923c11df775b6db
+- name: github.com/rlmcpherson/s3gof3r
+  version: b574ee38528c51c2c8652b79e71245817c59bd61
+- name: github.com/technoweenie/multipartstreamer
+  version: a90a01d73ae432e2611d178c18367fbaa13e0154
+- name: github.com/xchapter7x/goutil
+  version: 046742e03686eda64c6ac938594120d7fb5b3ecc
+  subpackages:
+  - itertools
+- name: github.com/xchapter7x/lo
+  version: aa2602d0e8e8647f0ce7b53109b37040941915aa
+- name: golang.org/x/crypto
+  version: ""
+  subpackages:
+  - ssh
+  - curve25519
+- name: gopkg.in/yaml.v1
+  version: 9f9df34309c04878acc86042b16630b0f696e1de
+devImports: []
