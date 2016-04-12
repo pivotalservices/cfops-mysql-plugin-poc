@@ -4,10 +4,8 @@ import:
 - package: github.com/pivotalservices/cfops
   subpackages:
   - plugin/cfopsplugin
-- package: github.com/pivotalservices/gtils
-  subpackages:
-  - command
-  - persistence
 - package: github.com/xchapter7x/lo
 - package: github.com/onsi/ginkgo
 - package: github.com/onsi/gomega
+- package: golang.org/x/crypto
+- package: github.com/pivotalservices/gtils
