@@ -1,13 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"io"
+	"os"
 
 	"github.com/pivotalservices/cfbackup"
 	cfopsplugin "github.com/pivotalservices/cfops/plugin/cfopsplugin"
 	"github.com/pivotalservices/gtils/command"
 	"github.com/pivotalservices/gtils/persistence"
 	"github.com/xchapter7x/lo"
+)
+
+var (
+	//NewRemoteExecuter -
+	NewRemoteExecuter = command.NewRemoteExecutor
 )
 
 func main() {
@@ -93,7 +100,9 @@ func (s *MysqlPlugin) Restore() (err error) {
 			if persistanceBackuper, err = s.GetPersistanceBackup(mysqlUserName, mysqlPassword, sshConfig); err == nil {
 				if reader, err = s.PivotalCF.NewArchiveReader(outputFileName); err == nil {
 					defer reader.Close()
-					err = persistanceBackuper.Import(reader)
+					if err = persistanceBackuper.Import(reader); err == nil {
+						err = s.GetPrivilegeFlusher(sshConfig, mysqlPassword)
+					}
 				}
 			}
 		}
@@ -121,6 +130,7 @@ func NewMysqlPlugin() *MysqlPlugin {
 			Name: pluginName,
 		},
 		GetPersistanceBackup: newMysqlDumper,
+		GetPrivilegeFlusher:  flushPrivileges,
 	}
 }
 
@@ -130,6 +140,7 @@ type MysqlPlugin struct {
 	InstallationSettings cfbackup.InstallationSettings
 	Meta                 cfopsplugin.Meta
 	GetPersistanceBackup func(string, string, command.SshConfig) (cfbackup.PersistanceBackup, error)
+	GetPrivilegeFlusher  func(command.SshConfig, string) error
 }
 
 func (s *MysqlPlugin) getMysqlCredentials() (userName, pwd string, err error) {
@@ -143,5 +154,19 @@ func (s *MysqlPlugin) getMysqlCredentials() (userName, pwd string, err error) {
 
 func newMysqlDumper(user string, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
 	pb, err = persistence.NewRemoteMysqlDumpWithPath(user, pass, config, mysqlRemoteArchivePath)
+	return
+}
+
+func flushPrivileges(sshConfig command.SshConfig, mysqlAdminPwd string) (err error) {
+	var remoteExecuter command.Executer
+	var writer io.WriteCloser
+
+	if remoteExecuter, err = NewRemoteExecuter(sshConfig); err == nil {
+		writer = os.Stdout
+		lo.G.Info("flushing priviledges after restore on ip ->", sshConfig.Host)
+		var commandToRun = fmt.Sprintf("/var/vcap/packages/mariadb/bin/mysql -u root -h localhost --password=%s -e 'FLUSH PRIVILEGES'", mysqlAdminPwd)
+		err = remoteExecuter.Execute(writer, commandToRun)
+		lo.G.Info("Done running flush priviledges on ip ->", sshConfig.Host, err)
+	}
 	return
 }

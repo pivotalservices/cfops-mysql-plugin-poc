@@ -50,6 +50,9 @@ func testInstallationSettings(installationSettingsPath string) {
 						GetPersistanceBackup: func(user, pass string, config command.SshConfig) (pb cfbackup.PersistanceBackup, err error) {
 							return fakePersistenceBackup, nil
 						},
+						GetPrivilegeFlusher: func(config command.SshConfig, pwd string) (err error) {
+							return
+						},
 					}
 					configParser := cfbackup.NewConfigurationParser(installationSettingsPath)
 					pivotalCF := cfopsplugin.NewPivotalCF(configParser.InstallationSettings, tileregistry.TileSpec{
