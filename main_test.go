@@ -9,9 +9,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotalservices/cfbackup"
+	"github.com/pivotalservices/cfbackup/tileregistry"
 	. "github.com/pivotalservices/cfops-mysql-plugin"
 	"github.com/pivotalservices/cfops/plugin/cfopsplugin"
-	"github.com/pivotalservices/cfops/tileregistry"
 	"github.com/pivotalservices/gtils/command"
 )
 

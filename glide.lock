@@ -1,5 +1,5 @@
-hash: ca5218023998e40af2b66f7651d10911bc456231bac4fd479ba3d1e33725e254
-updated: 2016-05-13T12:06:56.166198574-04:00
+hash: 5204d6f48819a08e2cff506d1da82f266343b3ef88e4136aa7aadefaf1b03224
+updated: 2016-05-13T12:12:39.213638428-04:00
 imports:
 - name: github.com/cloudfoundry-community/go-cfenv
   version: e01ad520da25cfac51386ef5143fdc2268a6f3b9
@@ -28,6 +28,7 @@ imports:
   version: 51722b51dc69dfdf76c9c056dce63ee8fd8474c0
   subpackages:
   - plugin/cfopsplugin
+  - tileregistry
 - name: github.com/pivotalservices/gtils
   version: 02f6e3fc7007ce437a04c201c60025dcda26fe04
   subpackages:
