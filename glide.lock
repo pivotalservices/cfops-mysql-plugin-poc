@@ -1,35 +1,35 @@
 hash: ca5218023998e40af2b66f7651d10911bc456231bac4fd479ba3d1e33725e254
-updated: 2016-04-12T01:17:46.040936558-05:00
+updated: 2016-05-13T12:06:56.166198574-04:00
 imports:
 - name: github.com/cloudfoundry-community/go-cfenv
-  version: b4bebec47a425334d2a076cf99329464c9e611f3
+  version: e01ad520da25cfac51386ef5143fdc2268a6f3b9
 - name: github.com/hashicorp/go-plugin
   version: cccb4a1328abbb89898f3ecf4311a05bddc4de6d
 - name: github.com/hashicorp/yamux
-  version: df949784da9ed028ee76df44652e42d37a09d7e4
+  version: c8a8a076e0858546ae6e2ee189d94e78b9b881ce
 - name: github.com/kr/fs
   version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
 - name: github.com/mitchellh/mapstructure
   version: 740c764bc6149d3f1806231418adb9f52c11bcbf
 - name: github.com/onsi/ginkgo
-  version: 2c2e9bb47b4e44067024f29339588cac8b34dd12
+  version: 5437a97bf824dec14e58d68c56ee36e772670c2e
 - name: github.com/onsi/gomega
-  version: 7ce781ea776b2fd506491011353bded2e40c8467
+  version: 815512bce8c889153a13104c9d9b2416153c1e02
 - name: github.com/op/go-logging
   version: 970db520ece77730c7e4724c61121037378659d9
 - name: github.com/pivotal-golang/lager
   version: 7639e31ce6622c55c15aa64144b85d5f4873d127
 - name: github.com/pivotalservices/cfbackup
-  version: df4bffd43e757db38caa5c225cb094cafd090542
+  version: e9ac914a3dc2d489ca579aab0830b2cf35052486
   subpackages:
+  - tileregistry
   - tiles/opsmanager
 - name: github.com/pivotalservices/cfops
-  version: d7f07059f46963afa0a71bb97f70aed51d13ea2c
+  version: 51722b51dc69dfdf76c9c056dce63ee8fd8474c0
   subpackages:
   - plugin/cfopsplugin
-  - tileregistry
 - name: github.com/pivotalservices/gtils
-  version: 30b7bd6468fb8fa1e1c938b665ce08a9f9e102de
+  version: 02f6e3fc7007ce437a04c201c60025dcda26fe04
   subpackages:
   - command
   - persistence
@@ -40,7 +40,7 @@ imports:
   - log
   - uaa
 - name: github.com/pkg/sftp
-  version: e84cc8c755ca39b7b64f510fe1fffc1b51f210a5
+  version: 9683e1ed9152e4fb052773355eb1b8cdcbac2058
 - name: github.com/rlmcpherson/s3gof3r
   version: 39f5507f61031141057f3f880d9fb9eb97b8afd7
 - name: github.com/technoweenie/multipartstreamer
@@ -52,10 +52,12 @@ imports:
 - name: github.com/xchapter7x/lo
   version: aa2602d0e8e8647f0ce7b53109b37040941915aa
 - name: golang.org/x/crypto
-  version: 3fbbcd23f1cb824e69491a5930cfeff09b12f4d2
+  version: 1e61df8d9ea476e2e1504cd9a32b40280c7c6c7e
   subpackages:
   - ssh
   - curve25519
+  - ed25519
+  - ed25519/internal/edwards25519
 - name: gopkg.in/yaml.v1
   version: 9f9df34309c04878acc86042b16630b0f696e1de
 devImports: []
