@@ -1,6 +1,7 @@
 package: github.com/pivotalservices/cfops-mysql-plugin
 import:
 - package: github.com/pivotalservices/cfbackup
+  version: master
 - package: github.com/pivotalservices/cfops
   subpackages:
   - plugin/cfopsplugin
