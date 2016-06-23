@@ -20,7 +20,7 @@ imports:
 - name: github.com/pivotal-golang/lager
   version: 7639e31ce6622c55c15aa64144b85d5f4873d127
 - name: github.com/pivotalservices/cfbackup
-  version: 4083f96a6dcac37e177194456ee89a8aa91861c0
+  version: f384aa15233f36e2ca421bd3767db7bc387fb8cd
   subpackages:
   - tileregistry
   - tiles/opsmanager
